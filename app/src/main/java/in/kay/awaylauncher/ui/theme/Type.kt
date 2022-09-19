@@ -19,13 +19,13 @@ val Typography = Typography(
         fontFamily = gilroy(),
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
-        color = colorBlack
+        color = colorWhite
     ),
     body2 = TextStyle(
         fontFamily = gilroy(),
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
-        color = colorSecondaryText
+        color = colorWhite
     ),
     defaultFontFamily = gilroy()
 )
