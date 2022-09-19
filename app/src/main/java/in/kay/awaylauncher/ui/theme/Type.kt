@@ -11,9 +11,9 @@ import androidx.compose.ui.unit.sp
 val Typography = Typography(
     h1 = TextStyle(
         fontFamily = gilroy(),
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.SemiBold,
         fontSize = 40.sp,
-        color = colorBlack
+        color = colorWhite
     ),
     body1= TextStyle(
         fontFamily = gilroy(),
