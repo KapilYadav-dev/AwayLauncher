@@ -1,6 +1,9 @@
 package `in`.kay.awaylauncher.presentation.home
 
-import `in`.kay.awaylauncher.ui.theme.*
+import `in`.kay.awaylauncher.presentation.HomeViewModel
+import `in`.kay.awaylauncher.ui.theme.Typography
+import `in`.kay.awaylauncher.ui.theme.colorBackground
+import `in`.kay.awaylauncher.ui.theme.colorWhite
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -8,7 +11,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,24 +26,47 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Preview
 @Composable
-fun HomeScreen() {
+fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
+    var currentTime by remember {
+        mutableStateOf("")
+    }
+    var currentAmPm by remember {
+        mutableStateOf("")
+    }
+    var currentDate by remember {
+        mutableStateOf("")
+    }
+    LaunchedEffect(key1 = true, block = {
+        viewModel.getTimeFlow().collect {
+            currentTime = it.first
+            currentAmPm = it.second
+        }
+    })
     Column() {
         BoxWithConstraints() {
             ConstraintLayout(
                 decoupledConstraints(24.dp), modifier = Modifier
                     .fillMaxSize()
                     .background(colorBackground)
-                    .padding(sixteenDp)
+                    .padding(16.dp)
             ) {
-                Text(
-                    text = "12:04",
-                    style = Typography.h1,
-                    fontSize = 32.sp,
-                    modifier = Modifier.layoutId("tvTime")
-                )
+                Row(modifier = Modifier.layoutId("tvTime")) {
+                    Text(
+                        text = currentTime,
+                        style = Typography.h1,
+                        fontSize = 32.sp
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(
+                        text = currentAmPm.uppercase(),
+                        style = Typography.h1,
+                        fontSize = 16.sp
+                    )
+                }
                 Text(
                     text = "Saturday, 17th September",
                     style = Typography.body1,
@@ -50,8 +76,8 @@ fun HomeScreen() {
                 Row(
                     modifier = Modifier
                         .layoutId("headerCard")
-                        .clip(RoundedCornerShape(thirtyTwoDp))
-                        .border(1.dp, colorWhite, RoundedCornerShape(thirtyTwoDp))
+                        .clip(RoundedCornerShape(32.dp))
+                        .border(1.dp, colorWhite, RoundedCornerShape(32.dp))
                         .padding(6.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -61,7 +87,7 @@ fun HomeScreen() {
                         tint = colorWhite,
                         modifier = Modifier
                             .size(26.dp)
-                            .clip(RoundedCornerShape(thirtyTwoDp))
+                            .clip(RoundedCornerShape(32.dp))
                     )
                     Text(
                         text = "Screen time : 9hr, 10mins",
@@ -122,15 +148,15 @@ private fun decoupledConstraints(margin: Dp): ConstraintSet {
 
         constrain(tvTime) {
             top.linkTo(parent.top, margin = margin)
-            start.linkTo(parent.start, margin = startMarginStandard)
+            start.linkTo(parent.start, margin = 24.dp)
         }
         constrain(tvDate) {
             top.linkTo(tvTime.bottom, 8.dp)
-            start.linkTo(parent.start, margin = startMarginStandard)
+            start.linkTo(parent.start, margin = 24.dp)
         }
         constrain(headerCard) {
-            top.linkTo(tvDate.bottom, twentyFourDp)
-            start.linkTo(parent.start, margin = sixteenDp)
+            top.linkTo(tvDate.bottom, 24.dp)
+            start.linkTo(parent.start, margin = 16.dp)
         }
         constrain(tvNoApps) {
             top.linkTo(parent.top)
@@ -146,8 +172,8 @@ private fun decoupledConstraints(margin: Dp): ConstraintSet {
             end.linkTo(ivDirection.start, (-36).dp)
         }
         constrain(ivAddApps) {
-            bottom.linkTo(parent.bottom, margin = startMarginStandard)
-            end.linkTo(parent.end, startMarginStandard)
+            bottom.linkTo(parent.bottom, margin = 24.dp)
+            end.linkTo(parent.end, 24.dp)
         }
     }
 }
