@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace 'in.kay.awaylauncher'
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
         applicationId "in.kay.awaylauncher"
         minSdk 24
-        targetSdk 32
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
@@ -72,4 +72,7 @@ dependencies {
     kapt "com.google.dagger:hilt-compiler:$dagger_version"
     //SharedPref
     implementation "androidx.datastore:datastore-preferences:1.0.0"
+    // Accompanist
+    implementation "com.google.accompanist:accompanist-permissions:0.26.4-beta"
+    implementation "com.google.accompanist:accompanist-drawablepainter:0.16.0" //
 }

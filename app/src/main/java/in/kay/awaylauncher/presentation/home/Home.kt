@@ -1,5 +1,6 @@
 package `in`.kay.awaylauncher.presentation.home
 
+import `in`.kay.awaylauncher.domain.model.AppInfo
 import `in`.kay.awaylauncher.presentation.HomeViewModel
 import `in`.kay.awaylauncher.ui.theme.Typography
 import `in`.kay.awaylauncher.ui.theme.colorBackground
@@ -8,18 +9,20 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -27,10 +30,12 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.google.accompanist.drawablepainter.rememberDrawablePainter
 
 @Preview
 @Composable
 fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
+    val context = LocalContext.current
     var currentTime by remember {
         mutableStateOf("")
     }
@@ -44,6 +49,11 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
         viewModel.getTimeFlow().collect {
             currentTime = it.first
             currentAmPm = it.second
+        }
+    })
+    LaunchedEffect(key1 = Unit, block = {
+        viewModel.getDate().collect {
+            currentDate = it
         }
     })
     Column() {
@@ -68,7 +78,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
                     )
                 }
                 Text(
-                    text = "Saturday, 17th September",
+                    text = currentDate,
                     style = Typography.body1,
                     color = colorWhite.copy(alpha = 0.5f),
                     modifier = Modifier.layoutId("tvDate")
@@ -98,41 +108,47 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
                             .padding(start = 12.dp, end = 24.dp)
                     )
                 }
-                Text(
-                    text = "Add your 5 favorites\napps here",
-                    style = Typography.h1,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.layoutId("tvNoApps")
-                )
-                Text(
-                    text = "Click here to\nadd apps",
-                    style = Typography.h1,
-                    fontSize = 16.sp,
-                    color = colorWhite.copy(alpha = 0.4f),
-                    fontWeight = FontWeight.SemiBold,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.layoutId("tvClickHere")
-                )
-
-                Image(
-                    painter = painterResource(id = `in`.kay.awaylauncher.R.drawable.img_dir),
-                    contentDescription = null,
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier
-                        .layoutId("ivDirection")
-                )
                 Image(
                     painter = painterResource(id = `in`.kay.awaylauncher.R.drawable.ic_btnadd),
                     contentDescription = "ic_add",
                     modifier = Modifier
                         .layoutId("ivAddApps")
                 )
+                LazyColumn(modifier = Modifier.layoutId("topAppsList")) {
+                    itemsIndexed(viewModel.appsList.subList(0, 5)) { index, appData ->
+                        AppCard(appData, index)
+                    }
+                }
             }
         }
     }
 }
+
+@Composable
+fun AppCard(appData: AppInfo, index: Int) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 12.dp)
+            .alpha(1f),
+        verticalAlignment = Alignment.CenterVertically,
+
+        ) {
+        Image(
+            painter = rememberDrawablePainter(appData.appIcon),
+            contentDescription = null,
+            modifier = Modifier.size(40.dp)
+        )
+        Spacer(modifier = Modifier.width(40.dp))
+        Text(
+            text = appData.appName.toString(),
+            fontWeight = FontWeight.SemiBold,
+            style = Typography.h1,
+            fontSize = 24.sp,
+        )
+    }
+}
+
 
 private fun decoupledConstraints(margin: Dp): ConstraintSet {
     return ConstraintSet {
@@ -174,6 +190,12 @@ private fun decoupledConstraints(margin: Dp): ConstraintSet {
         constrain(ivAddApps) {
             bottom.linkTo(parent.bottom, margin = 24.dp)
             end.linkTo(parent.end, 24.dp)
+        }
+        constrain(topAppsList) {
+            top.linkTo(headerCard.bottom, 24.dp)
+            start.linkTo(parent.start, 56.dp)
+            end.linkTo(parent.end, 24.dp)
+            bottom.linkTo(parent.bottom)
         }
     }
 }
